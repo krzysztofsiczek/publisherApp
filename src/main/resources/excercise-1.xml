@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library xmlns="http://example.net/library/1.0">
+	<authors>
+		<author id="a1">
+			<name>John</name>
+			<surname>Applesed</surname>
+			<born>1979-11-11</born>
+		</author>
+		<author id="a2">
+			<name>Krzysztof</name>
+			<surname>Habdank</surname>
+			<born>1965-12-12</born>
+		</author>
+		<author id="a3">
+			<name>Paulo</name>
+			<surname>Coelho</surname>
+			<born>1915-06-17</born>
+		</author>
+		<author id="a4">
+			<name>Mikołaj</name>
+			<surname>Kopernik</surname>
+			<born>1473-02-19</born>
+			<died>1543-05-24</died>
+		</author>
+	</authors>
+	<books>
+		<book id="b1" author-id="a1">
+			<title>Missing opportunity</title>
+			<published>1992</published>
+			<isbn>978-3-16-148410-0</isbn>
+		</book>
+		<book id="b2" author-id="a4">
+			<title>O obrotach sfer niebieskich</title>
+			<published>1543</published>
+		</book>
+	</books>
+</library>
