@@ -13,14 +13,32 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 public class Producer {
+
 	public static void main(String[] args) {
+
+		String xmlMessage;
+		try {
+			xmlMessage = getXmlAsString("src/main/resources/excercise-1.xml");
+		} catch (TransformerException e1) {
+			System.out.println("Input data error.");
+			return;
+		} catch (ParserConfigurationException e2) {
+			System.out.println("Input data error.");
+			return;
+		} catch (SAXException e3) {
+			System.out.println("Input data error.");
+			return;
+		} catch (IOException e4) {
+			System.out.println("Input data error.");
+			return;
+		}
+
 		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 		Connection connection = null;
 
@@ -31,68 +49,34 @@ public class Producer {
 
 			Topic topic = session.createTopic("Example.Library.Publication");
 			MessageProducer producer = session.createProducer(topic);
-
-			Document document = parseXml();
-			String xmlMessage = getXmlAsString(document);
-
-			TextMessage message = session.createTextMessage(xmlMessage);
-			producer.send(message);
-
+			producer.send(session.createTextMessage(xmlMessage));
 		} catch (JMSException e) {
-
 			e.printStackTrace();
 		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (JMSException e) {
-
-					e.printStackTrace();
-				}
-			}
+			closeConnection(connection);
 		}
 	}
 
-	private static Document parseXml() {
+	private static void closeConnection(Connection connection) {
+		if (connection == null)
+			return;
+		try {
+			connection.close();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static String getXmlAsString(String path)
+			throws TransformerException, ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder documentBuilder = null;
-		try {
-			documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-
-			e.printStackTrace();
-		}
-		try {
-			return documentBuilder.parse(Producer.class.getResourceAsStream("excercise-1.xml"));
-		} catch (SAXException e) {
-
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-
-			e.printStackTrace();
-			return null;
-		}
-		
-	}
-
-	private static String getXmlAsString(Document document) {
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+		Document document = documentBuilder.parse(path);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		Transformer transformer = null;
-		try {
-			transformer = transformerFactory.newTransformer();
-		} catch (TransformerConfigurationException e) {
-			
-			e.printStackTrace();
-		}
+		Transformer transformer = transformerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		StringWriter writer = new StringWriter();
-		try {
-			transformer.transform(new DOMSource(document), new StreamResult(writer));
-		} catch (TransformerException e) {
-			
-			e.printStackTrace();
-		}
+		transformer.transform(new DOMSource(document), new StreamResult(writer));
 		return writer.getBuffer().toString();
 	}
 }
